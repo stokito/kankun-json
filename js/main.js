@@ -61,10 +61,10 @@ function UpdateSwitchData( id ) {
 
       // show actions
       $('#colapseable-header-' + id + ' span').html( switchMeta.DisplayName );
-      $('#colapseable-content-' + id + ' span').html('');
+      var $actionsListContent = $('#colapseable-content-' + id + ' span').empty();
       $.each( switchMeta.links.actions, function ( key, data ) {
         var actionUrl = buildActionUrl( switchMeta, data );
-        $('#colapseable-content-' + id + ' span').append( '<button class="ui-btn" id="' + id + '-action-' + key + '">' + key + '</button>' );
+        $actionsListContent.append( '<button class="ui-btn" id="' + id + '-action-' + key + '">' + key + '</button>' );
 
         $('#' + id + '-action-' + key).click( { url: actionUrl }, function( evt ) {
           takeAction( evt.data.url, id );
