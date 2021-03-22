@@ -1,14 +1,6 @@
 #!/bin/sh
-echo $QUERY_STRING > /tmp/query_string
 VERSION=0.1.0
 RELAY_CTRL=/sys/class/leds/tp-link:blue:relay/brightness
-IP_ADDRESS=`ifconfig wlan0 | sed ':a;N;$!ba;s/\n/","/g' | grep -E -o '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -n 1`
-TZ=`cat /etc/TZ`
-SSID=`iw dev wlan0 link | sed -n -e 's/^.*SSID: //p'`
-WIFI_SIGNAL=`iw dev wlan0 link | grep signal | awk '{ print $2 }'`
-WIFI_CHANNEL=`iw dev wlan0 info | grep channel | awk '{ print $2 }'`
-MACADDR=`iw dev wlan0 info  | grep addr | awk '{ print $2 }'`
-UPTIME=`uptime | awk -F , '{ print $1 }'`
 LWRAPPER=""
 RWRAPPER=""
 CURRENT_STATE=`cat $RELAY_CTRL`
@@ -106,5 +98,12 @@ if [ "$canceljob" -ge 0 ] 2> /dev/null; then
 fi
 
 if [ -z "$get" ] && [ -z "$set" ]; then
+  IP_ADDRESS=`ifconfig wlan0 | sed ':a;N;$!ba;s/\n/","/g' | grep -E -o '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -n 1`
+  TZ=`cat /etc/TZ`
+  SSID=`iw dev wlan0 link | sed -n -e 's/^.*SSID: //p'`
+  WIFI_SIGNAL=`iw dev wlan0 link | grep signal | awk '{ print $2 }'`
+  WIFI_CHANNEL=`iw dev wlan0 info | grep channel | awk '{ print $2 }'`
+  MACADDR=`iw dev wlan0 info  | grep addr | awk '{ print $2 }'`
+  UPTIME=`uptime | awk -F , '{ print $1 }'`
   echo "$callback$LWRAPPER{\"info\":{\"name\":\"kankun-json\",\"version\":\"$VERSION\",\"ipAddress\":\"$IP_ADDRESS\",\"macaddr\":\"$MACADDR\",\"ssid\":\"$SSID\",\"channel\":\"$WIFI_CHANNEL\",\"signal\":\"$WIFI_SIGNAL\",\"timezone\":\"$TZ\",\"uptime\":\"$UPTIME\"},\"links\":{\"meta\":{\"state\":\"/cgi-bin/json.cgi?get=state\"},\"actions\":{\"on\":\"/cgi-bin/json.cgi?set=on\",\"ondelay\":\"/cgi-bin/json.cgi?set=on&mins=60\",\"off\":\"/cgi-bin/json.cgi?set=off\",\"offdelay\":\"/cgi-bin/json.cgi?set=off&mins=60\"}}}$RWRAPPER"
 fi
