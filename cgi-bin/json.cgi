@@ -99,7 +99,7 @@ fi
 
 if [ -z "$get" ] && [ -z "$set" ]; then
   IP_ADDRESS=$(ifconfig wlan0 | sed ':a;N;$!ba;s/\n/","/g' | grep -E -o '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
-  TZ=$(cat /etc/TZ)
+  TZ=$(date +%Z)
   SSID=$(iw dev wlan0 link | sed -n -e 's/^.*SSID: //p')
   WIFI_SIGNAL=$(iw dev wlan0 link | grep signal | awk '{ print $2 }')
   WIFI_CHANNEL=$(iw dev wlan0 info | grep channel | awk '{ print $2 }')
