@@ -12,12 +12,12 @@ canceljob=$(echo "$QUERY_STRING" | sed -n 's/^.*canceljob=\([^&]*\).*$/\1/p' | s
 
 callback=$(echo "$QUERY_STRING" | sed -n 's/^.*callback=\([^&]*\).*$/\1/p' | sed "s/%20/ /g")
 
-if [ ! -z "$callback" ]; then
+if [ -n "$callback" ]; then
   LWRAPPER="("
   RWRAPPER=")"
 fi
 
-if [ ! -z "$callback" ]; then
+if [ -n "$callback" ]; then
   echo "Content-Type: application/javascript"
 else
   echo "Content-Type: application/json"
@@ -55,7 +55,7 @@ esac
 
 case "$set" in
   on)
-    if [ ! -z $mins ]; then
+    if [ -n "$mins" ]; then
       echo "echo 1 > $RELAY_CTRL" | at now + $mins minute -M -q b
     else
       echo 1 > $RELAY_CTRL
@@ -63,7 +63,7 @@ case "$set" in
     echo "$callback$LWRAPPER{\"ok\":true}$RWRAPPER"
   ;;
   off)
-    if [ ! -z $mins ]; then
+    if [ -n "$mins" ]; then
       echo "echo 0 > $RELAY_CTRL" | at now + $mins minute -M -q c
     else
       echo 0 > $RELAY_CTRL
@@ -73,14 +73,14 @@ case "$set" in
   toggle)
     case "$CURRENT_STATE" in
       0)
-        if [ ! -z $mins ]; then
+        if [ -n "$mins" ]; then
           echo "echo 1 > $RELAY_CTRL" | at now + $mins minute -M -q d
         else
           echo 1 > $RELAY_CTRL
         fi
       ;;
       1)
-        if [ ! -z $mins ]; then
+        if [ -n "$mins" ]; then
           echo "echo 0 > $RELAY_CTRL" | at now + $mins minute -M -q d
         else
           echo 0 > $RELAY_CTRL
