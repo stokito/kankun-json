@@ -45,6 +45,9 @@ case "$get" in
       1)
         echo "$callback$LWRAPPER{\"state\":\"on\"}$RWRAPPER"
         ;;
+      *)
+        echo "$callback$LWRAPPER{\"state\":\"unknown\"}$RWRAPPER"
+        ;;
     esac
     ;;
   jobs) # list all the scheduled jobs
