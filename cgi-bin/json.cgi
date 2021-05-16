@@ -1,6 +1,12 @@
 #!/bin/sh
 VERSION=0.1.0
 RELAY_CTRL=/sys/class/leds/tp-link:blue:relay/brightness
+if [ ! -e $RELAY_CTRL ]; then
+  # this is not a stock firmware
+  RELAY_CTRL=/sys/devices/virtual/gpio/gpio26/value
+  echo 26 > /sys/class/gpio/export
+  echo out > /sys/class/gpio/gpio26/direction
+fi
 LWRAPPER=""
 RWRAPPER=""
 CURRENT_STATE=$(cat $RELAY_CTRL)
