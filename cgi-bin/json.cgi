@@ -32,6 +32,10 @@ echo "Cache-Control: no-cache, must-revalidate"
 echo "Expires: Sat, 26 Jul 1997 05:00:00 GMT"
 echo
 
+if [ -z "$get" ] && [ -z "$set" ]; then
+  get="meta"
+fi
+
 case "$get" in
   state)
     case "$CURRENT_STATE" in
@@ -56,6 +60,20 @@ case "$get" in
         echo "$joblist"
       done
       echo "]}$RWRAPPER"
+  ;;
+  meta)
+    IP_ADDRESS=$(ifconfig wlan0 | sed ':a;N;$!ba;s/\n/","/g' | grep -E -o '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
+    TZ=$(date +%Z)
+    SSID=$(iw dev wlan0 link | sed -n -e 's/^.*SSID: //p')
+    WIFI_SIGNAL=$(iw dev wlan0 link | grep signal | awk '{ print $2 }')
+    WIFI_CHANNEL=$(iw dev wlan0 info | grep channel | awk '{ print $2 }')
+    MACADDR=$(iw dev wlan0 info  | grep addr | awk '{ print $2 }')
+    UPTIME=$(uptime | awk -F , '{ print $1 }')
+    echo "$callback$LWRAPPER{\"info\":{\"name\":\"kankun-json\",\"version\":\"$VERSION\",\"timezone\":\"$TZ\",\"uptime\":\"$UPTIME\"},
+    \"ipAddress\":\"$IP_ADDRESS\",\"macaddr\":\"$MACADDR\",\"ssid\":\"$SSID\",\"channel\":\"$WIFI_CHANNEL\",\"signal\":\"$WIFI_SIGNAL\",
+    \"links\":{\"meta\":{\"state\":\"/cgi-bin/json.cgi?get=state\"},
+    \"actions\":{\"on\":\"/cgi-bin/json.cgi?set=on\",\"off\":\"/cgi-bin/json.cgi?set=off\",
+    \"ondelay\":\"/cgi-bin/json.cgi?set=on&mins=60\",\"offdelay\":\"/cgi-bin/json.cgi?set=off&mins=60\"}}}$RWRAPPER"
   ;;
 esac
 
@@ -101,19 +119,4 @@ esac
 if [ "$canceljob" -ge 0 ] 2> /dev/null; then
   atrm "$canceljob"
   echo "$callback$LWRAPPER{\"ok\":true}$RWRAPPER"
-fi
-
-if [ -z "$get" ] && [ -z "$set" ]; then
-  IP_ADDRESS=$(ifconfig wlan0 | sed ':a;N;$!ba;s/\n/","/g' | grep -E -o '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
-  TZ=$(date +%Z)
-  SSID=$(iw dev wlan0 link | sed -n -e 's/^.*SSID: //p')
-  WIFI_SIGNAL=$(iw dev wlan0 link | grep signal | awk '{ print $2 }')
-  WIFI_CHANNEL=$(iw dev wlan0 info | grep channel | awk '{ print $2 }')
-  MACADDR=$(iw dev wlan0 info  | grep addr | awk '{ print $2 }')
-  UPTIME=$(uptime | awk -F , '{ print $1 }')
-  echo "$callback$LWRAPPER{\"info\":{\"name\":\"kankun-json\",\"version\":\"$VERSION\",\"timezone\":\"$TZ\",\"uptime\":\"$UPTIME\"},
-  \"ipAddress\":\"$IP_ADDRESS\",\"macaddr\":\"$MACADDR\",\"ssid\":\"$SSID\",\"channel\":\"$WIFI_CHANNEL\",\"signal\":\"$WIFI_SIGNAL\",
-  \"links\":{\"meta\":{\"state\":\"/cgi-bin/json.cgi?get=state\"},
-  \"actions\":{\"on\":\"/cgi-bin/json.cgi?set=on\",\"off\":\"/cgi-bin/json.cgi?set=off\",
-  \"ondelay\":\"/cgi-bin/json.cgi?set=on&mins=60\",\"offdelay\":\"/cgi-bin/json.cgi?set=off&mins=60\"}}}$RWRAPPER"
 fi
