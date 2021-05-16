@@ -39,42 +39,44 @@ fi
 case "$get" in
   state)
     case "$CURRENT_STATE" in
-      0) echo "$callback$LWRAPPER{\"state\":\"off\"}$RWRAPPER"
-      ;;
-      1) echo "$callback$LWRAPPER{\"state\":\"on\"}$RWRAPPER"
-      ;;
+      0)
+        echo "$callback$LWRAPPER{\"state\":\"off\"}$RWRAPPER"
+        ;;
+      1)
+        echo "$callback$LWRAPPER{\"state\":\"on\"}$RWRAPPER"
+        ;;
     esac
-  ;;
-  jobs)  # list all the scheduled jobs
-      i=0
-      echo "$callback$LWRAPPER{\"jobs\":["
-      atq | while read line; do
-        job_id=$(echo $line | awk '{ print $1 }')
-        job_date=$(echo $line | awk '{ print $5, $2, $3, $4, $6 }')
-        job_queue=$(echo $line | awk '{ print $7 }')
-        joblist="{\"jobid\":$job_id,\"queue\":\"$job_queue\",\"date\":\"$job_date\"}"
-        if [ $i -ne 0 ]; then
-          echo ",";
-        fi
-        i=1
-        echo "$joblist"
-      done
-      echo "]}$RWRAPPER"
-  ;;
+    ;;
+  jobs) # list all the scheduled jobs
+    i=0
+    echo "$callback$LWRAPPER{\"jobs\":["
+    atq | while read line; do
+      job_id=$(echo $line | awk '{ print $1 }')
+      job_date=$(echo $line | awk '{ print $5, $2, $3, $4, $6 }')
+      job_queue=$(echo $line | awk '{ print $7 }')
+      joblist="{\"jobid\":$job_id,\"queue\":\"$job_queue\",\"date\":\"$job_date\"}"
+      if [ $i -ne 0 ]; then
+        echo ","
+      fi
+      i=1
+      echo "$joblist"
+    done
+    echo "]}$RWRAPPER"
+    ;;
   meta)
     IP_ADDRESS=$(ifconfig wlan0 | sed ':a;N;$!ba;s/\n/","/g' | grep -E -o '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
     TZ=$(date +%Z)
     SSID=$(iw dev wlan0 link | sed -n -e 's/^.*SSID: //p')
     WIFI_SIGNAL=$(iw dev wlan0 link | grep signal | awk '{ print $2 }')
     WIFI_CHANNEL=$(iw dev wlan0 info | grep channel | awk '{ print $2 }')
-    MACADDR=$(iw dev wlan0 info  | grep addr | awk '{ print $2 }')
+    MACADDR=$(iw dev wlan0 info | grep addr | awk '{ print $2 }')
     UPTIME=$(uptime | awk -F , '{ print $1 }')
     echo "$callback$LWRAPPER{\"info\":{\"name\":\"kankun-json\",\"version\":\"$VERSION\",\"timezone\":\"$TZ\",\"uptime\":\"$UPTIME\"},
     \"ipAddress\":\"$IP_ADDRESS\",\"macaddr\":\"$MACADDR\",\"ssid\":\"$SSID\",\"channel\":\"$WIFI_CHANNEL\",\"signal\":\"$WIFI_SIGNAL\",
     \"links\":{\"meta\":{\"state\":\"/cgi-bin/json.cgi?get=state\"},
     \"actions\":{\"on\":\"/cgi-bin/json.cgi?set=on\",\"off\":\"/cgi-bin/json.cgi?set=off\",
     \"ondelay\":\"/cgi-bin/json.cgi?set=on&mins=60\",\"offdelay\":\"/cgi-bin/json.cgi?set=off&mins=60\"}}}$RWRAPPER"
-  ;;
+    ;;
 esac
 
 case "$set" in
@@ -85,7 +87,7 @@ case "$set" in
       echo 1 > $RELAY_CTRL
     fi
     echo "$callback$LWRAPPER{\"ok\":true}$RWRAPPER"
-  ;;
+    ;;
   off)
     if [ -n "$mins" ]; then
       echo "echo 0 > $RELAY_CTRL" | at now + $mins minute -M -q c
@@ -93,7 +95,7 @@ case "$set" in
       echo 0 > $RELAY_CTRL
     fi
     echo "$callback$LWRAPPER{\"ok\":true}$RWRAPPER"
-  ;;
+    ;;
   toggle)
     case "$CURRENT_STATE" in
       0)
@@ -102,19 +104,18 @@ case "$set" in
         else
           echo 1 > $RELAY_CTRL
         fi
-      ;;
+        ;;
       1)
         if [ -n "$mins" ]; then
           echo "echo 0 > $RELAY_CTRL" | at now + $mins minute -M -q d
         else
           echo 0 > $RELAY_CTRL
         fi
-      ;;
+        ;;
     esac
     echo "$callback$LWRAPPER{\"ok\":true}$RWRAPPER"
-  ;;
+    ;;
 esac
-
 
 if [ "$canceljob" -ge 0 ] 2> /dev/null; then
   atrm "$canceljob"
