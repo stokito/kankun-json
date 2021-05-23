@@ -2,8 +2,6 @@
 
 A CGI script that provides a simple web interface and RESTful JSON API for the Kankun Small K wifi switch.
 
-_This project is a fork of Konstantin Dondoshanskiy's `relay.cgi` script._
-
 ## Features
 
 * Get current status of switch
@@ -20,7 +18,7 @@ _This project is a fork of Konstantin Dondoshanskiy's `relay.cgi` script._
 
 Visit the IP address of your switch in your web browser:
 
-`http://10.0.0.10/`
+[http://10.0.0.10/](http://10.0.0.10/)
 
 This should show you information about the switches, and allow you to control them.
 
@@ -29,13 +27,13 @@ You can see how to turn the switch on / off, or set delayed on / off.
 
 ## Screenshots
 
-![Main web interface](https://cldup.com/5D7vMF0lTd-1200x1200.png)
+![Main web interface](./5D7vMF0lTd-1200x1200.png)
 
-![Individual switch slide down](https://cldup.com/IWUIAjr2pJ-1200x1200.png)
+![Individual switch slide down](./IWUIAjr2pJ-1200x1200.png)
 
 ## Example API Output
 
-Output from the base end-point, `http://10.0.0.10/cgi-bin/json.cgi`. _(Shown pretty-printed for legibility.)_
+Output from the base end-point, [http://10.0.0.10/cgi-bin/json.cgi](http://10.0.0.10/cgi-bin/json.cgi). _(Shown pretty-printed for legibility.)_
 
 ```json
 {
@@ -65,4 +63,7 @@ Output from the base end-point, `http://10.0.0.10/cgi-bin/json.cgi`. _(Shown pre
 
 ## Contributing
 
-If you'd like to contribute to the development of kankun-json, please review the [guidelines for contributing](https://github.com/homedash/kankun-json/blob/master/CONTRIBUTING.md).
+If you'd like to contribute to the development of kankun-json, please review the [guidelines for contributing](./CONTRIBUTING.md).
+
+## Authors
+This project is based on Konstantin Dondoshanskiy's `relay.cgi` script.
