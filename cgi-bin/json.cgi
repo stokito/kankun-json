@@ -74,11 +74,13 @@ case "$get" in
     WIFI_CHANNEL=$(iw dev wlan0 info | grep channel | awk '{ print $2 }')
     MACADDR=$(iw dev wlan0 info | grep addr | awk '{ print $2 }')
     UPTIME=$(uptime | awk -F , '{ print $1 }')
-    echo "$callback$LWRAPPER{\"info\":{\"name\":\"kankun-json\",\"version\":\"$VERSION\",\"timezone\":\"$TZ\",\"uptime\":\"$UPTIME\"},
+    echo "$callback$LWRAPPER{
+    \"info\":{\"name\":\"kankun-json\",\"version\":\"$VERSION\",\"timezone\":\"$TZ\",\"uptime\":\"$UPTIME\"},
     \"ipAddress\":\"$IP_ADDRESS\",\"macaddr\":\"$MACADDR\",\"ssid\":\"$SSID\",\"channel\":\"$WIFI_CHANNEL\",\"signal\":\"$WIFI_SIGNAL\",
     \"links\":{\"meta\":{\"state\":\"/cgi-bin/json.cgi?get=state\"},
     \"actions\":{\"on\":\"/cgi-bin/json.cgi?set=on\",\"off\":\"/cgi-bin/json.cgi?set=off\",
-    \"ondelay\":\"/cgi-bin/json.cgi?set=on&mins=60\",\"offdelay\":\"/cgi-bin/json.cgi?set=off&mins=60\"}}}$RWRAPPER"
+    \"ondelay\":\"/cgi-bin/json.cgi?set=on&mins=60\",\"offdelay\":\"/cgi-bin/json.cgi?set=off&mins=60\"}}"
+    echo "}$RWRAPPER"
     ;;
 esac
 
