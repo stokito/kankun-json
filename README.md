@@ -1,6 +1,6 @@
 # kankun-json
 
-A CGI script that provides a simple web interface and RESTful JSON API for the Kankun Small K wifi switch.
+A CGI script that provides a simple web interface and RESTful JSON API for the Kankun Small K wifi switch [KK-SP3](https://openwrt.org/toh/kankun/kk-sp3).
 
 ## Features
 
@@ -27,9 +27,9 @@ You can see how to turn the switch on / off, or set delayed on / off.
 
 ## Screenshots
 
-![Main web interface](./5D7vMF0lTd-1200x1200.png)
+![Main web interface](./MainWebInterface-1200x1200.png)
 
-![Individual switch slide down](./IWUIAjr2pJ-1200x1200.png)
+![Individual switch slide down](./IndividualSwitchSlideDown-1200x1200.png)
 
 ## Example API Output
 
