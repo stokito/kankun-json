@@ -11,8 +11,10 @@ $(document).ready( function() {
       $('#switches').html( '<div data-role="collapsible-set" id="switches-set"></div>' );
       var menuCollapsed = ( data.switches.length > 1 ? 'true' : 'false' );
       $.each( data.switches, function( i, switchMeta ) {
-        var switchId = 'SW-' + slugify( switchMeta.DisplayName );
-        switchMeta.id = switchId;
+        if (!switchMeta.id) {
+          var switchId = 'SW-' + slugify( switchMeta.DisplayName );
+          switchMeta.id = switchId;
+        }
         all_switches[switchMeta.id] = switchMeta;
 
         $('#switches-set').append(
