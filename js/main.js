@@ -19,7 +19,7 @@ $(document).ready( function() {
 
         $('#switches-set').append(
           '<div data-role="collapsible" data-collapsed="' + menuCollapsed + '" id="' + switchMeta.id + '"> \
-            <h3 id="colapseable-header-' + switchMeta.id + '"><span>' + switchMeta.id + '</span><img id="imgSignal-' + switchMeta.id + '" src="images/wifi_a1.png"  height="25" width="20" align="right"></h3> \
+            <h3 id="colapseable-header-' + switchMeta.id + '"><span>' + switchMeta.DisplayName + '</span><img id="imgSignal-' + switchMeta.id + '" src="images/wifi_a1.png"  height="25" width="20" align="right"></h3> \
             <p id="colapseable-content-' + switchMeta.id + '"><span> \
               <div class="ui-field-contain"><label for="slider-fill'+switchMeta.id+'">Delay mins:</label> \
               <input type="range" name="slider-fill'+switchMeta.id+'" id="slider-fill-'+switchMeta.id+'" value="60" min="0" max="300"  step="15" data-highlight="true"></div> \
