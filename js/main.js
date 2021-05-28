@@ -11,18 +11,18 @@ $(document).ready( function() {
       $('#switches').html( '<div data-role="collapsible-set" id="switches-set"></div>' );
       var menuCollapsed = ( data.switches.length > 1 ? 'true' : 'false' );
       $.each( data.switches, function( i, switchMeta ) {
-        var new_id = 'SW-' + slugify( switchMeta.DisplayName );
-        switchMeta.id = new_id;
-        all_switches[new_id] = switchMeta;
+        var switchId = 'SW-' + slugify( switchMeta.DisplayName );
+        switchMeta.id = switchId;
+        all_switches[switchMeta.id] = switchMeta;
 
         $('#switches-set').append(
-          '<div data-role="collapsible" data-collapsed="' + menuCollapsed + '" id="' + new_id + '"> \
-            <h3 id="colapseable-header-' + new_id + '"><span>' + new_id + '</span><img id="imgSignal-' + new_id + '" src="images/wifi_a1.png"  height="25" width="20" align="right"></h3> \
-            <p id="colapseable-content-' + new_id + '"><span> \
-              <div class="ui-field-contain"><label for="slider-fill'+new_id+'">Delay mins:</label> \
-              <input type="range" name="slider-fill'+new_id+'" id="slider-fill-'+new_id+'" value="60" min="0" max="300"  step="15" data-highlight="true"></div> \
-            </span></p><table id="infotbl-' + new_id + '"> \
-            </table><table id="jobtbl-' + new_id + '"></table> \
+          '<div data-role="collapsible" data-collapsed="' + menuCollapsed + '" id="' + switchMeta.id + '"> \
+            <h3 id="colapseable-header-' + switchMeta.id + '"><span>' + switchMeta.id + '</span><img id="imgSignal-' + switchMeta.id + '" src="images/wifi_a1.png"  height="25" width="20" align="right"></h3> \
+            <p id="colapseable-content-' + switchMeta.id + '"><span> \
+              <div class="ui-field-contain"><label for="slider-fill'+switchMeta.id+'">Delay mins:</label> \
+              <input type="range" name="slider-fill'+switchMeta.id+'" id="slider-fill-'+switchMeta.id+'" value="60" min="0" max="300"  step="15" data-highlight="true"></div> \
+            </span></p><table id="infotbl-' + switchMeta.id + '"> \
+            </table><table id="jobtbl-' + switchMeta.id + '"></table> \
         </div>')
           .collapsibleset().trigger( 'create' );
 
