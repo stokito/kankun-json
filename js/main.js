@@ -104,41 +104,15 @@ function UpdateSwitchData( switchMeta ) {
 }
 
 function getSignalStrengthImage( dBm ) {
-  var wifiImages = [];
-  wifiImages['none'] = 'wifi_a1.png';
-  wifiImages['low'] = 'wifi_a2.png';
-  wifiImages['poor'] = 'wifi_a3.png';
-  wifiImages['fair'] = 'wifi_a4.png';
-  wifiImages['good'] = 'wifi_a5.png';
-  wifiImages['excellent'] = 'wifi_a6.png';
+  var wifiImages = [ 'wifi_a6.png', 'wifi_a5.png', 'wifi_a4.png', 'wifi_a3.png', 'wifi_a2.png'];
 
-  dBm = Math.ceil( Math.abs( dBm ) / 10 );
+  var signalStrength = Math.ceil( Math.abs( dBm ) / 10 );
 
-  if ( dBm > 7 )
-    dBm = 8;
-  if ( dBm < 5)
-    dBm = 4;
-
-  var signalStrength = '';
-
-  switch ( dBm ) {
-    case 4:
-      signalStrength = 'excellent';
-      break;
-    case 5:
-      signalStrength = 'good';
-      break;
-    case 6:
-      signalStrength = 'fair';
-      break;
-    case 7:
-      signalStrength = 'poor';
-      break;
-    default:
-      signalStrength = 'low';
-  }
-
-  return wifiImages[signalStrength];
+  if ( signalStrength > 7 )
+    signalStrength = 8;
+  if ( signalStrength < 5)
+    signalStrength = 4;
+  return wifiImages[signalStrength - 4];
 }
 
 function slugify( text ) {
