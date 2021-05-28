@@ -32,14 +32,13 @@ $(document).ready( function() {
     });
 });
 
-function takeAction( url, id ) {
+function takeAction( url, switchMeta ) {
   // if the url includes mins it's a delayed action, use the value from the slider.
   if ( url.lastIndexOf( '&mins=60' ) ) {
-    var v = $( '#slider-fill-' + id ).val();
+    var v = $( '#slider-fill-' + switchMeta.id ).val();
     url = url.replace( '&mins=60', '&mins=' + v );
   }
   $.getJSON( url + '&callback=?', function( result ) {
-    var switchMeta = all_switches[id];
     UpdateSwitchData( switchMeta );
   });
 }
@@ -47,7 +46,7 @@ function takeAction( url, id ) {
 function UpdateSwitchData( switchMeta ) {
   $.ajax( { url: buildActionUrl( switchMeta, '/cgi-bin/json.cgi' ), cache: false, dataType: 'jsonp' } )
     .fail( function( e, textStatus ) {
-      $('#imgSignal-' + id).attr( 'src', 'images/wifi_a2.png' );
+      $('#imgSignal-' + switchMeta.id).attr( 'src', 'images/wifi_a2.png' );
       alert( 'Unable to connect: ' + textStatus );
     })
     .done( function( data ) { // enable switch
@@ -56,22 +55,22 @@ function UpdateSwitchData( switchMeta ) {
 
       //check the wifi signal
       var imgSig = ( 'images/' + getSignalStrengthImage( switchMeta.info.signal ) );
-      $('#imgSignal-' + id).attr( 'src', imgSig );
+      $('#imgSignal-' + switchMeta.id).attr( 'src', imgSig );
 
       // show actions
-      $('#colapseable-header-' + id + ' span').html( switchMeta.DisplayName );
-      var $actionsListContent = $('#colapseable-content-' + id + ' span').empty();
+      $('#colapseable-header-' + switchMeta.id + ' span').html( switchMeta.DisplayName );
+      var $actionsListContent = $('#colapseable-content-' + switchMeta.id + ' span').empty();
       $.each( switchMeta.links.actions, function ( key, data ) {
         var actionUrl = buildActionUrl( switchMeta, data );
-        $actionsListContent.append( '<button class="ui-btn" id="' + id + '-action-' + key + '">' + key + '</button>' );
+        $actionsListContent.append( '<button class="ui-btn" id="' + switchMeta.id + '-action-' + key + '">' + key + '</button>' );
 
-        $('#' + id + '-action-' + key).click( { url: actionUrl }, function( evt ) {
-          takeAction( evt.data.url, id );
+        $('#' + switchMeta.id + '-action-' + key).click( { url: actionUrl }, function( evt ) {
+          takeAction( evt.data.url, switchMeta );
         });
       });
 
       //show network info
-      $('#infotbl-' + id).empty()
+      $('#infotbl-' + switchMeta.id).empty()
         .append('<tr><td>Uptime:</td><td>' + switchMeta.info.uptime + '</td></tr>')
         .append('<tr><td>IP:</td><td>' + switchMeta.ip + '</td></tr>')
         .append('<tr><td>MAC:</td><td>' + switchMeta.info.macaddr + '</td></tr>')
@@ -80,22 +79,22 @@ function UpdateSwitchData( switchMeta ) {
         .append('<tr><td>Signal:</td><td>' + switchMeta.info.signal + ' dBm</td></tr>');
 
       // show wifi info
-      $('#right-' + id + ' span').append( '<span>' + switchMeta.info.ssid + '</span></br>' )
+      $('#right-' + switchMeta.id + ' span').append( '<span>' + switchMeta.info.ssid + '</span></br>' )
         .append( '<span>ch ' + switchMeta.info.channel + '</span>' );
 
       //update switch based on actual reported state
       $.getJSON( buildActionUrl( switchMeta, switchMeta.links.meta.state ) + '&callback=?', function( result ) {
-        $('#colapseable-header-' + id + ' span').html( switchMeta.DisplayName + ' (' + result.state + ')' );
+        $('#colapseable-header-' + switchMeta.id + ' span').html( switchMeta.DisplayName + ' (' + result.state + ')' );
       });
 
       //list any scheduled jobs
       var getjobs_url = buildActionUrl( switchMeta, '/cgi-bin/json.cgi?get=jobs' );
-      $('#jobtbl-' + id).empty();
+      $('#jobtbl-' + switchMeta.id).empty();
       $.getJSON( getjobs_url + '&callback=?', function( result ) {
         $.each( result.jobs, function ( key, data ) {
           var action = ( ( data.queue == 'b' ) ? 'on' : 'off' );
           var cancel_url = buildActionUrl( switchMeta, '/cgi-bin/json.cgi?canceljob=' + data.jobid );
-          $('#jobtbl-' + id).append( '<tr><td>' + action + '</td><td>' + data.date + '</td><td><a href="' + cancel_url + '" class="ui-btn ui-icon-delete ui-btn-icon-left " >cancel</a></td></tr>' );
+          $('#jobtbl-' + switchMeta.id).append( '<tr><td>' + action + '</td><td>' + data.date + '</td><td><a href="' + cancel_url + '" class="ui-btn ui-icon-delete ui-btn-icon-left " >cancel</a></td></tr>' );
         });
       });
 
