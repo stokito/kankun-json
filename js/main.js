@@ -10,8 +10,10 @@ $(document).ready( function() {
       // create a section for each switch
       $('#switches').html( '<div data-role="collapsible-set" id="switches-set"></div>' );
       var menuCollapsed = ( data.switches.length > 1 ? 'true' : 'false' );
-      $.each( data.switches, function( i, obj ) {
-        var new_id = 'SW-' + slugify( obj.DisplayName );
+      $.each( data.switches, function( i, switchMeta ) {
+        var new_id = 'SW-' + slugify( switchMeta.DisplayName );
+        switchMeta.id = new_id;
+        all_switches[new_id] = switchMeta;
 
         $('#switches-set').append(
           '<div data-role="collapsible" data-collapsed="' + menuCollapsed + '" id="' + new_id + '"> \
@@ -24,27 +26,25 @@ $(document).ready( function() {
         </div>')
           .collapsibleset().trigger( 'create' );
 
-        all_switches[new_id] = obj;
-        all_switches[new_id].id = new_id;
-        UpdateSwitchData( new_id );
-        setInterval( function() { UpdateSwitchData( new_id ) }, 5000 );
+        UpdateSwitchData( switchMeta );
+        setInterval( function() { UpdateSwitchData( switchMeta ) }, 5000 );
       });
     });
 });
 
 function takeAction( url, id ) {
-  if ( url.lastIndexOf( '&mins=60' ) ) {  // if the url includes mins it's a delyed action, use the value from the slider.
+  // if the url includes mins it's a delayed action, use the value from the slider.
+  if ( url.lastIndexOf( '&mins=60' ) ) {
     var v = $( '#slider-fill-' + id ).val();
     url = url.replace( '&mins=60', '&mins=' + v );
   }
   $.getJSON( url + '&callback=?', function( result ) {
-    UpdateSwitchData( id );
+    var switchMeta = all_switches[id];
+    UpdateSwitchData( switchMeta );
   });
 }
 
-function UpdateSwitchData( id ) {
-  var switchMeta = all_switches[id];
-
+function UpdateSwitchData( switchMeta ) {
   $.ajax( { url: buildActionUrl( switchMeta, '/cgi-bin/json.cgi' ), cache: false, dataType: 'jsonp' } )
     .fail( function( e, textStatus ) {
       $('#imgSignal-' + id).attr( 'src', 'images/wifi_a2.png' );
