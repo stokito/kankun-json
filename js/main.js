@@ -2,7 +2,7 @@ var all_switches = {};
 
 $(document).ready( function() {
   // get the list of switches to poll
-  $.ajax( { url: 'switches.json', cache: false, dataType: 'json' } )
+  $.ajax( { url: 'switches.json', dataType: 'json' } )
     .fail( function( e, textStatus ) {
       alert( 'Cannot find any switches\nPlease check for switches.json file.\nError: ' + textStatus );
     })
@@ -44,7 +44,7 @@ function takeAction( url, switchMeta ) {
 }
 
 function UpdateSwitchData( switchMeta ) {
-  $.ajax( { url: buildActionUrl( switchMeta, '/cgi-bin/json.cgi' ), cache: false, dataType: 'jsonp' } )
+  $.ajax( { url: buildActionUrl( switchMeta, '/cgi-bin/json.cgi' ), dataType: 'jsonp' } )
     .fail( function( e, textStatus ) {
       $('#imgSignal-' + switchMeta.id).attr( 'src', 'images/wifi_a2.png' );
       alert( 'Unable to connect: ' + textStatus );
