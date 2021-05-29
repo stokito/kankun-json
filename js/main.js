@@ -8,9 +8,8 @@ $(document).ready( function() {
     })
     .done( function( data ) {
       // create a section for each switch
-      $('#switches').html( '<div data-role="collapsible-set" id="switches-set"></div>' );
       var $switchesSet = $('#switches-set');
-      var menuCollapsed = ( data.switches.length > 1 ? 'true' : 'false' );
+      var menuCollapsed = data.switches.length > 1 ? 'true' : 'false';
       $.each( data.switches, function( i, switchMeta ) {
         if (!switchMeta.id) {
           var switchId = 'SW-' + slugify( switchMeta.DisplayName );
@@ -20,21 +19,25 @@ $(document).ready( function() {
 
         var $switchTemplate = $('<div data-role="collapsible"> \
             <h3 class="colapseable-header"><span class="displayName"></span><img class="imgSignal" src="images/wifi_a1.png"  height="25" width="20" align="right"></h3> \
-            <p class="colapseable-content"><span class="actions"> \
-              <div class="ui-field-contain"><label>Delay mins:</label> \
-              <input type="range" class="slider-fill" value="60" min="0" max="300"  step="15" data-highlight="true"></div> \
-            </span></p><table class="infotbl"> \
-            </table><table class="jobtbl"></table> \
+            <div class="colapseable-content"> \
+            <div class="actions"> \
+              <div class="ui-field-contain"> \
+                <label>Delay mins:</label> \
+                <input type="range" class="slider-fill" value="60" min="0" max="300"  step="15" data-highlight="true"></div> \
+              </div> \
+            </div> \
+            <table class="infotbl"></table> \
+            <table class="jobtbl"></table> \
           </div>');
         $switchTemplate.attr('id', switchMeta.id)
             .attr('data-collapsed', menuCollapsed)
             .find('.displayName').text(switchMeta.DisplayName);
-        $switchesSet.append($switchTemplate)
-          .collapsibleset().trigger( 'create' );
+        $switchesSet.append($switchTemplate);
 
         UpdateSwitchData( switchMeta );
         setInterval( function() { UpdateSwitchData( switchMeta ) }, 5000 );
       });
+      $switchesSet.collapsibleset().trigger( 'create' );
     });
 });
 
