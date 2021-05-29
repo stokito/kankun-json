@@ -9,6 +9,7 @@ $(document).ready( function() {
     .done( function( data ) {
       // create a section for each switch
       $('#switches').html( '<div data-role="collapsible-set" id="switches-set"></div>' );
+      var $switchesSet = $('#switches-set');
       var menuCollapsed = ( data.switches.length > 1 ? 'true' : 'false' );
       $.each( data.switches, function( i, switchMeta ) {
         if (!switchMeta.id) {
@@ -17,15 +18,18 @@ $(document).ready( function() {
         }
         all_switches[switchMeta.id] = switchMeta;
 
-        $('#switches-set').append(
-          '<div data-role="collapsible" data-collapsed="' + menuCollapsed + '" id="' + switchMeta.id + '"> \
-            <h3 id="colapseable-header-' + switchMeta.id + '"><span>' + switchMeta.DisplayName + '</span><img id="imgSignal-' + switchMeta.id + '" src="images/wifi_a1.png"  height="25" width="20" align="right"></h3> \
-            <p id="colapseable-content-' + switchMeta.id + '"><span> \
-              <div class="ui-field-contain"><label for="slider-fill'+switchMeta.id+'">Delay mins:</label> \
-              <input type="range" name="slider-fill'+switchMeta.id+'" id="slider-fill-'+switchMeta.id+'" value="60" min="0" max="300"  step="15" data-highlight="true"></div> \
-            </span></p><table id="infotbl-' + switchMeta.id + '"> \
-            </table><table id="jobtbl-' + switchMeta.id + '"></table> \
-        </div>')
+        var $switchTemplate = $('<div data-role="collapsible"> \
+            <h3 class="colapseable-header"><span class="displayName"></span><img class="imgSignal" src="images/wifi_a1.png"  height="25" width="20" align="right"></h3> \
+            <p class="colapseable-content"><span class="actions"> \
+              <div class="ui-field-contain"><label>Delay mins:</label> \
+              <input type="range" class="slider-fill" value="60" min="0" max="300"  step="15" data-highlight="true"></div> \
+            </span></p><table class="infotbl"> \
+            </table><table class="jobtbl"></table> \
+          </div>');
+        $switchTemplate.attr('id', switchMeta.id)
+            .attr('data-collapsed', menuCollapsed)
+            .find('.displayName').text(switchMeta.DisplayName);
+        $switchesSet.append($switchTemplate)
           .collapsibleset().trigger( 'create' );
 
         UpdateSwitchData( switchMeta );
@@ -37,7 +41,7 @@ $(document).ready( function() {
 function takeAction( url, switchMeta ) {
   // if the url includes mins it's a delayed action, use the value from the slider.
   if ( url.lastIndexOf( '&mins=60' ) ) {
-    var v = $( '#slider-fill-' + switchMeta.id ).val();
+    var v = $( '#' + switchMeta.id + ' .slider-fill').val();
     url = url.replace( '&mins=60', '&mins=' + v );
   }
   $.getJSON( url + '&callback=?', function( result ) {
@@ -46,9 +50,10 @@ function takeAction( url, switchMeta ) {
 }
 
 function UpdateSwitchData( switchMeta ) {
+  var $switchTemplate = $('#' + switchMeta.id);
   $.ajax( { url: buildActionUrl( switchMeta, '/cgi-bin/json.cgi' ), dataType: 'jsonp' } )
     .fail( function( e, textStatus ) {
-      $('#imgSignal-' + switchMeta.id).attr( 'src', 'images/wifi_a2.png' );
+      $switchTemplate.find('.imgSignal').attr( 'src', 'images/wifi_a2.png' );
       alert( 'Unable to connect: ' + textStatus );
     })
     .done( function( data ) { // enable switch
@@ -57,22 +62,23 @@ function UpdateSwitchData( switchMeta ) {
 
       //check the wifi signal
       var imgSig = ( 'images/' + getSignalStrengthImage( switchMeta.info.signal ) );
-      $('#imgSignal-' + switchMeta.id).attr( 'src', imgSig );
+      $switchTemplate.find('.imgSignal').attr( 'src', imgSig );
 
+      $switchTemplate.find('.displayName').text( switchMeta.DisplayName );
       // show actions
-      $('#colapseable-header-' + switchMeta.id + ' span').html( switchMeta.DisplayName );
-      var $actionsListContent = $('#colapseable-content-' + switchMeta.id + ' span').empty();
+      var $actionsListContent = $switchTemplate.find('.actions').empty();
       $.each( switchMeta.links.actions, function ( key, data ) {
         var actionUrl = buildActionUrl( switchMeta, data );
-        $actionsListContent.append( '<button class="ui-btn" id="' + switchMeta.id + '-action-' + key + '">' + key + '</button>' );
-
-        $('#' + switchMeta.id + '-action-' + key).click( { url: actionUrl }, function( evt ) {
-          takeAction( evt.data.url, switchMeta );
-        });
+        $('<button class="ui-btn action-' + key + '"></button>' )
+            .text(key)
+            .click( { url: actionUrl }, function( evt ) {
+               takeAction( evt.data.url, switchMeta );
+            })
+            .appendTo($actionsListContent);
       });
 
       //show network info
-      $('#infotbl-' + switchMeta.id).empty()
+      $switchTemplate.find('.infotbl').empty()
         .append('<tr><td>Uptime:</td><td>' + switchMeta.info.uptime + '</td></tr>')
         .append('<tr><td>IP:</td><td>' + switchMeta.ip + '</td></tr>')
         .append('<tr><td>MAC:</td><td>' + switchMeta.info.macaddr + '</td></tr>')
@@ -81,22 +87,23 @@ function UpdateSwitchData( switchMeta ) {
         .append('<tr><td>Signal:</td><td>' + switchMeta.info.signal + ' dBm</td></tr>');
 
       // show wifi info
-      $('#right-' + switchMeta.id + ' span').append( '<span>' + switchMeta.info.ssid + '</span></br>' )
+      $switchTemplate.find('.right span').append( '<span>' + switchMeta.info.ssid + '</span></br>' )
         .append( '<span>ch ' + switchMeta.info.channel + '</span>' );
 
       //update switch based on actual reported state
       $.getJSON( buildActionUrl( switchMeta, switchMeta.links.meta.state ) + '&callback=?', function( result ) {
-        $('#colapseable-header-' + switchMeta.id + ' span').html( switchMeta.DisplayName + ' (' + result.state + ')' );
+        $switchTemplate.find('.displayName').text( switchMeta.DisplayName + ' (' + result.state + ')' );
       });
 
       //list any scheduled jobs
       var getjobs_url = buildActionUrl( switchMeta, '/cgi-bin/json.cgi?get=jobs' );
-      $('#jobtbl-' + switchMeta.id).empty();
+      var $jobTable = $switchTemplate.find('.jobtbl');
+      $jobTable.empty();
       $.getJSON( getjobs_url + '&callback=?', function( result ) {
         $.each( result.jobs, function ( key, data ) {
           var action = ( ( data.queue == 'b' ) ? 'on' : 'off' );
           var cancel_url = buildActionUrl( switchMeta, '/cgi-bin/json.cgi?canceljob=' + data.jobid );
-          $('#jobtbl-' + switchMeta.id).append( '<tr><td>' + action + '</td><td>' + data.date + '</td><td><a href="' + cancel_url + '" class="ui-btn ui-icon-delete ui-btn-icon-left " >cancel</a></td></tr>' );
+          $jobTable.append( '<tr><td>' + action + '</td><td>' + data.date + '</td><td><a href="' + cancel_url + '" class="ui-btn ui-icon-delete ui-btn-icon-left " >cancel</a></td></tr>' );
         });
       });
 
