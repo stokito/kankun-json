@@ -85,13 +85,9 @@ function UpdateSwitchData( switchMeta ) {
         .append('<tr><td>Uptime:</td><td>' + switchMeta.info.uptime + '</td></tr>')
         .append('<tr><td>IP:</td><td>' + switchMeta.ip + '</td></tr>')
         .append('<tr><td>MAC:</td><td>' + switchMeta.info.macaddr + '</td></tr>')
-        .append('<tr><td>BSID:</td><td>' + switchMeta.info.ssid + '</td></tr>')
+        .append('<tr><td>SSID:</td><td>' + switchMeta.info.ssid + '</td></tr>')
         .append('<tr><td>Channel:</td><td>' + switchMeta.info.channel + '</td></tr>')
         .append('<tr><td>Signal:</td><td>' + switchMeta.info.signal + ' dBm</td></tr>');
-
-      // show wifi info
-      $switchTemplate.find('.right span').append( '<span>' + switchMeta.info.ssid + '</span></br>' )
-        .append( '<span>ch ' + switchMeta.info.channel + '</span>' );
 
       //update switch based on actual reported state
       $.getJSON( buildActionUrl( switchMeta, switchMeta.links.meta.state ) + '&callback=?', function( result ) {
