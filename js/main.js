@@ -45,7 +45,7 @@ $(document).ready( function() {
 
 function takeAction( url, switchMeta, $sliderFill ) {
   // if the url includes mins it's a delayed action, use the value from the slider.
-  if ( url.lastIndexOf( '&mins=60' ) ) {
+  if ( url.lastIndexOf( '&mins=60' ) > 0 ) {
     var v = $sliderFill.val();
     url = url.replace( '&mins=60', '&mins=' + v );
   }
@@ -77,8 +77,8 @@ function UpdateSwitchData( switchMeta ) {
         var actionUrl = buildActionUrl( switchMeta, data );
         $('<button class="ui-btn action-' + key + '"></button>' )
             .text(key)
-            .click( { url: actionUrl }, function( evt ) {
-               takeAction( evt.data.url, switchMeta, $sliderFill );
+            .click(function( evt ) {
+               takeAction( actionUrl, switchMeta, $sliderFill );
             })
             .appendTo($actionsListContent);
       });
@@ -105,7 +105,12 @@ function UpdateSwitchData( switchMeta ) {
         $.each( result.jobs, function ( key, data ) {
           var action = ( ( data.queue == 'b' ) ? 'on' : 'off' );
           var cancel_url = buildActionUrl( switchMeta, '/cgi-bin/json.cgi?canceljob=' + data.jobid );
-          $jobTable.append( '<tr><td>' + action + '</td><td>' + data.date + '</td><td><a href="' + cancel_url + '" class="ui-btn ui-icon-delete ui-btn-icon-left " >cancel</a></td></tr>' );
+          var $cancelBtn = $('<a class="ui-btn ui-icon-delete ui-btn-icon-left">cancel</a>')
+              .click(function (evt) {
+                takeAction(cancel_url, switchMeta, null);
+              });
+          var $jobRow = $('<tr></tr>').append($('<td></td>').text(action)).append($('<td></td>').text(data.date)).append($('<td></td>').append($cancelBtn));
+          $jobTable.append( $jobRow);
         });
       });
 
