@@ -20,10 +20,12 @@ $(document).ready( function() {
         var $switchTemplate = $('<div data-role="collapsible"> \
             <h3 class="colapseable-header"><span class="displayName"></span><img class="imgSignal" src="images/wifi_a1.png"  height="25" width="20" align="right"></h3> \
             <div class="colapseable-content"> \
-            <div class="actions"> \
-              <div class="ui-field-contain"> \
-                <label>Delay mins:</label> \
-                <input type="range" class="slider-fill" value="60" min="0" max="300"  step="15" data-highlight="true"></div> \
+              <div> \
+                <div class="actions"></div> \
+                <div class="ui-field-contain"> \
+                  <label>Delay mins:</label> \
+                  <input type="range" class="slider-fill" value="60" min="0" max="300"  step="15" data-highlight="true"/> \
+                </div> \
               </div> \
             </div> \
             <table class="infotbl"></table> \
@@ -41,10 +43,10 @@ $(document).ready( function() {
     });
 });
 
-function takeAction( url, switchMeta ) {
+function takeAction( url, switchMeta, $sliderFill ) {
   // if the url includes mins it's a delayed action, use the value from the slider.
   if ( url.lastIndexOf( '&mins=60' ) ) {
-    var v = $( '#' + switchMeta.id + ' .slider-fill').val();
+    var v = $sliderFill.val();
     url = url.replace( '&mins=60', '&mins=' + v );
   }
   $.getJSON( url + '&callback=?', function( result ) {
@@ -68,6 +70,7 @@ function UpdateSwitchData( switchMeta ) {
       $switchTemplate.find('.imgSignal').attr( 'src', imgSig );
 
       $switchTemplate.find('.displayName').text( switchMeta.DisplayName );
+      var $sliderFill = $switchTemplate.find('.slider-fill');
       // show actions
       var $actionsListContent = $switchTemplate.find('.actions').empty();
       $.each( switchMeta.links.actions, function ( key, data ) {
@@ -75,7 +78,7 @@ function UpdateSwitchData( switchMeta ) {
         $('<button class="ui-btn action-' + key + '"></button>' )
             .text(key)
             .click( { url: actionUrl }, function( evt ) {
-               takeAction( evt.data.url, switchMeta );
+               takeAction( evt.data.url, switchMeta, $sliderFill );
             })
             .appendTo($actionsListContent);
       });
