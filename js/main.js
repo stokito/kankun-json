@@ -99,22 +99,26 @@ function UpdateSwitchData( switchMeta ) {
 
       //list any scheduled jobs
       var getjobs_url = buildActionUrl( switchMeta, '/cgi-bin/json.cgi?get=jobs' );
-      var $jobTable = $switchTemplate.find('.jobtbl');
-      $jobTable.empty();
       $.getJSON( getjobs_url + '&callback=?', function( result ) {
-        $.each( result.jobs, function ( key, data ) {
-          var action = ( ( data.queue == 'b' ) ? 'on' : 'off' );
-          var cancel_url = buildActionUrl( switchMeta, '/cgi-bin/json.cgi?canceljob=' + data.jobid );
-          var $cancelBtn = $('<a class="ui-btn ui-icon-delete ui-btn-icon-left">cancel</a>')
-              .click(function (evt) {
-                takeAction(cancel_url, switchMeta, null);
-              });
-          var $jobRow = $('<tr></tr>').append($('<td></td>').text(action)).append($('<td></td>').text(data.date)).append($('<td></td>').append($cancelBtn));
-          $jobTable.append( $jobRow);
-        });
+        renderJobs($switchTemplate, result, switchMeta);
       });
 
     });
+}
+
+function renderJobs($switchTemplate, result, switchMeta) {
+  var $jobTable = $switchTemplate.find('.jobtbl');
+  $jobTable.empty();
+  $.each(result.jobs, function (key, data) {
+    var action = ((data.queue == 'b') ? 'on' : 'off');
+    var cancel_url = buildActionUrl(switchMeta, '/cgi-bin/json.cgi?canceljob=' + data.jobid);
+    var $cancelBtn = $('<a class="ui-btn ui-icon-delete ui-btn-icon-left">cancel</a>')
+        .click(function (evt) {
+          takeAction(cancel_url, switchMeta, null);
+        });
+    var $jobRow = $('<tr></tr>').append($('<td></td>').text(action)).append($('<td></td>').text(data.date)).append($('<td></td>').append($cancelBtn));
+    $jobTable.append($jobRow);
+  });
 }
 
 function getSignalStrengthImage( dBm ) {
