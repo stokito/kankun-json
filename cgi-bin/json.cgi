@@ -1,5 +1,5 @@
 #!/bin/sh
-VERSION=0.1.0
+VERSION=0.1.1
 RELAY_CTRL=/sys/class/leds/tp-link:blue:relay/brightness
 if [ ! -e $RELAY_CTRL ]; then
   # this is not a stock firmware
