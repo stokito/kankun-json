@@ -37,7 +37,8 @@ $(document).ready( function() {
         $switchesSet.append($switchTemplate);
 
         UpdateSwitchData( switchMeta );
-        setInterval( function() { UpdateSwitchData( switchMeta ) }, 5000 );
+        setInterval( function() { UpdateSwitchData( switchMeta ) }, 60000 );
+        setInterval( function() { updateSwitchState( switchMeta ) }, 5000 );
       });
       $switchesSet.collapsibleset().trigger( 'create' );
     });
@@ -69,7 +70,12 @@ function UpdateSwitchData( switchMeta ) {
       var imgSig = ( 'images/' + getSignalStrengthImage( switchMeta.info.signal ) );
       $switchTemplate.find('.imgSignal').attr( 'src', imgSig );
 
-      $switchTemplate.find('.displayName').text( switchMeta.DisplayName );
+      if (switchMeta.state !== undefined) {
+        $switchTemplate.find('.displayName').text( switchMeta.DisplayName + ' (' + switchMeta.state + ')' );
+      } else {
+        $switchTemplate.find('.displayName').text(switchMeta.DisplayName);
+      }
+
       var $sliderFill = $switchTemplate.find('.slider-fill');
       // show actions
       var $actionsListContent = $switchTemplate.find('.actions').empty();
@@ -92,11 +98,6 @@ function UpdateSwitchData( switchMeta ) {
         .append('<tr><td>Channel:</td><td>' + switchMeta.info.channel + '</td></tr>')
         .append('<tr><td>Signal:</td><td>' + switchMeta.info.signal + ' dBm</td></tr>');
 
-      //update switch based on actual reported state
-      $.getJSON( buildActionUrl( switchMeta, switchMeta.links.meta.state ) + '&callback=?', function( result ) {
-        $switchTemplate.find('.displayName').text( switchMeta.DisplayName + ' (' + result.state + ')' );
-      });
-
       //list any scheduled jobs
       var getjobs_url = buildActionUrl( switchMeta, '/cgi-bin/json.cgi?get=jobs' );
       $.getJSON( getjobs_url + '&callback=?', function( result ) {
@@ -104,6 +105,14 @@ function UpdateSwitchData( switchMeta ) {
       });
 
     });
+}
+
+function updateSwitchState( switchMeta ) {
+  var $switchTemplate = $('#' + switchMeta.id);
+  // update switch based on actual reported state
+  $.getJSON( buildActionUrl( switchMeta, switchMeta.links.meta.state ) + '&callback=?', function( result ) {
+    $switchTemplate.find('.displayName').text( switchMeta.DisplayName + ' (' + result.state + ')' );
+  });
 }
 
 function renderJobs($switchTemplate, result, switchMeta) {

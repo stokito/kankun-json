@@ -77,7 +77,7 @@ case "$get" in
     MACADDR=$(iw dev wlan0 info | grep addr | awk '{ print $2 }')
     UPTIME=$(uptime | awk -F , '{ print $1 }')
     echo "$callback$LWRAPPER{
-    \"ipAddress\":\"$IP_ADDRESS\",
+    \"ipAddress\":\"$IP_ADDRESS\",\"state\":\"$CURRENT_STATUS\",
     \"info\":{\"name\":\"kankun-json\",\"version\":\"$VERSION\",\"timezone\":\"$TZ\",\"uptime\":\"$UPTIME\",
     \"macaddr\":\"$MACADDR\",\"ssid\":\"$SSID\",\"channel\":\"$WIFI_CHANNEL\",\"signal\":\"$WIFI_SIGNAL\"},
     \"links\":{\"meta\":{\"state\":\"/cgi-bin/json.cgi?get=state\"},
