@@ -36,19 +36,21 @@ if [ -z "$get" ] && [ -z "$set" ] && [ -z "$canceljob" ]; then
   get="meta"
 fi
 
+case "$CURRENT_STATE" in
+  0)
+    CURRENT_STATUS="off"
+    ;;
+  1)
+    CURRENT_STATUS="on"
+    ;;
+  *)
+    CURRENT_STATUS="unknown"
+    ;;
+esac
+
 case "$get" in
   state)
-    case "$CURRENT_STATE" in
-      0)
-        echo "$callback$LWRAPPER{\"state\":\"off\"}$RWRAPPER"
-        ;;
-      1)
-        echo "$callback$LWRAPPER{\"state\":\"on\"}$RWRAPPER"
-        ;;
-      *)
-        echo "$callback$LWRAPPER{\"state\":\"unknown\"}$RWRAPPER"
-        ;;
-    esac
+    echo "$callback$LWRAPPER{\"state\":\"$CURRENT_STATUS\"}$RWRAPPER"
     ;;
   jobs) # list all the scheduled jobs
     i=0
@@ -85,43 +87,36 @@ case "$get" in
     ;;
 esac
 
-case "$set" in
-  on)
-    if [ -n "$mins" ]; then
-      echo "echo 1 > $RELAY_CTRL" | at now + $mins minute -M -q b
-    else
-      echo 1 > $RELAY_CTRL
-    fi
-    echo "$callback$LWRAPPER{\"ok\":true}$RWRAPPER"
-    ;;
-  off)
-    if [ -n "$mins" ]; then
-      echo "echo 0 > $RELAY_CTRL" | at now + $mins minute -M -q c
-    else
-      echo 0 > $RELAY_CTRL
-    fi
-    echo "$callback$LWRAPPER{\"ok\":true}$RWRAPPER"
-    ;;
-  toggle)
-    case "$CURRENT_STATE" in
-      0)
-        if [ -n "$mins" ]; then
-          echo "echo 1 > $RELAY_CTRL" | at now + $mins minute -M -q d
-        else
-          echo 1 > $RELAY_CTRL
-        fi
-        ;;
-      1)
-        if [ -n "$mins" ]; then
-          echo "echo 0 > $RELAY_CTRL" | at now + $mins minute -M -q d
-        else
-          echo 0 > $RELAY_CTRL
-        fi
-        ;;
-    esac
-    echo "$callback$LWRAPPER{\"ok\":true}$RWRAPPER"
-    ;;
-esac
+if [ -n "$set" ]; then
+  NEW_STATUS=-1
+  case "$set" in
+    on)
+      QUEUE=b
+      NEW_STATUS=1
+      ;;
+    off)
+      QUEUE=c
+      NEW_STATUS=0
+      ;;
+    toggle)
+      QUEUE=d
+      case "$CURRENT_STATE" in
+        0)
+          NEW_STATUS=1
+          ;;
+        1)
+          NEW_STATUS=0
+          ;;
+      esac
+      ;;
+  esac
+  if [ -n "$mins" ]; then
+    echo "echo $NEW_STATUS > $RELAY_CTRL" | at now + $mins minute -M -q $QUEUE
+  else
+    echo "$NEW_STATUS" > $RELAY_CTRL
+  fi
+  echo "$callback$LWRAPPER{\"ok\":true}$RWRAPPER"
+fi
 
 if [ "$canceljob" -ge 0 ] 2> /dev/null; then
   atrm "$canceljob"
