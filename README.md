@@ -1,6 +1,8 @@
 # kankun-json
 
-A CGI script that provides a simple web interface and RESTful JSON API for the Kankun Small K wifi switch.
+Kankun KK-SP3 Small K Wi-Fi switch that can be controlled via proprietary Android app (but it doesn't work anymore).
+The CGI script provides a simple web interface and RESTful JSON API for the Home Assistant.
+See the [device Wiki page](https://github.com/yurt-page/Kankun_KK-SP3) for details.
 
 _This project is a fork of Konstantin Dondoshanskiy's `relay.cgi` script._
 
