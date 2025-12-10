@@ -1,5 +1,5 @@
 #!/bin/sh
-VERSION=0.1.0
+VERSION=0.2.0
 RELAY_CTRL=/sys/class/leds/tp-link:blue:relay/brightness
 if [ ! -f RELAY_CTRL ]; then
   # assume this is OpenWrt
