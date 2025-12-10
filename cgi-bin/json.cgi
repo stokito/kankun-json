@@ -1,6 +1,12 @@
 #!/bin/sh
 VERSION=0.1.0
 RELAY_CTRL=/sys/class/leds/tp-link:blue:relay/brightness
+if [ ! -f RELAY_CTRL ]; then
+  # assume this is OpenWrt
+  echo 26 > /sys/class/gpio/export
+  echo out > /sys/class/gpio/gpio26/direction
+  RELAY_CTRL=/sys/class/gpio/gpio26/value
+fi
 IP_ADDRESS=`ifconfig wlan0 | sed ':a;N;$!ba;s/\n/","/g' | grep -E -o '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -n 1`
 TZ=`cat /etc/TZ`
 SSID=`iw dev wlan0 link | grep SSID | awk '{ print $2 }'`
