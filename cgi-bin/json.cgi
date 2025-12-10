@@ -1,5 +1,4 @@
 #!/bin/sh
-echo $QUERY_STRING > /tmp/query_string
 VERSION=0.1.0
 RELAY_CTRL=/sys/class/leds/tp-link:blue:relay/brightness
 IP_ADDRESS=`ifconfig wlan0 | sed ':a;N;$!ba;s/\n/","/g' | grep -E -o '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -n 1`
