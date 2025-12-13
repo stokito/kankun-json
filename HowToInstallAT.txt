@@ -31,3 +31,31 @@ opkg install at
 TEST
 echo "Hello World" | at now + 1 minute -m
 atq
+
+### Install REST API script and Web UI
+Edit the `switches.json` and set your switch IP address:
+```json
+{
+  "switches": [
+    {
+      "DisplayName": "Switch 1",
+      "ip": "192.168.0.100"
+    }
+  ]
+}
+```
+
+Then upload files to the router over SCP:
+```sh
+scp -O -r cgi-bin/ kankun:/www/
+scp -O -r css/ kankun:/www/
+scp -O -r images/ kankun:/www/
+scp -O -r js/ kankun:/www/
+scp -O -r index.html kankun:/www/
+scp -O -r robots.txt kankun:/www/
+scp -O -r switches.json kankun:/www/
+```
+Make the CGI script executable on the socket:
+```sh
+chmod +x /www/cgi-bin/json.cgi
+```
